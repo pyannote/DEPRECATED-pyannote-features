@@ -58,8 +58,6 @@ class OpenCVFeatureExtractor(object):
 
             data[f, :] = self.process_frame(frame)
 
-            print '%d / %d' % (f, frameCount)
-
         duration = step = 1. / framePerSecond
         sliding_window = SlidingWindow(start=0., duration=duration, step=step)
         return SlidingWindowFeature(data, sliding_window)
