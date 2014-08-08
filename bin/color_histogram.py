@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS (Hervé BREDIN - http://herve.niderb.fr)
+# Copyright (c) 2014 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +23,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# AUTHORS
+# Hervé BREDIN - http://herve.niderb.fr
+
 """
 Compute color histograms from a video
 
 Usage:
-  color_histogram [-R <R>] [-G <G>] [-B <B>] [-H <H>] [-S <S>] [-V <V>] [--numpy] <input.mkv> <output.pkl>
+  color_histogram [-R <R>] [-G <G>] [-B <B>] [-H <H>] [-S <S>] [-V <V>] [--numpy] [--progress] <input.mkv> <output.pkl>
   color_histogram -h | --help
   color_histogram --version
 
@@ -38,6 +41,7 @@ Options:
   -H <H> --hue=<H>         Set number of bins in H channel [default: 0]
   -S <S> --saturation=<S>  Set number of bins in S channel [default: 0]
   -V <V> --value=<V>       Set number of bins in V channel [default: 0]
+  --progress               Show progress bar.
   --numpy                  Save as numpy array.
   -h --help                Show this screen.
   --version                Show version.
@@ -47,17 +51,25 @@ from pyannote.features.video.opencv import ColorHistogramFeatureExtractor
 from docopt import docopt
 import numpy as np
 import pickle
+from progressbar import ProgressBar, Percentage, Bar, ETA
 
 
 FMT_PICKLE = 'pkl'
 FMT_NUMPY = 'npy'
 
 
-def do_it(input_video, output_file, format=FMT_PICKLE,
+def do_it(input_video, output_file, format=FMT_PICKLE, progress=False,
           R=0, G=0, B=0, H=0, S=0, V=0):
 
+    if progress:
+        pbar = ProgressBar(
+            widgets=[Percentage(), ' ', Bar(), ' ', ETA()],
+            maxval=1.).start()
+    else:
+        pbar = None
+
     extractor = ColorHistogramFeatureExtractor(R=R, G=G, B=B, H=H, S=S, V=V)
-    features = extractor.extract(input_video)
+    features = extractor.extract(input_video, pbar=pbar)
 
     with open(output_file, 'wb') as f:
 
@@ -81,10 +93,12 @@ if __name__ == '__main__':
     input_video = arguments['<input.mkv>']
     output_file = arguments['<output.pkl>']
 
+    progress = arguments['--progress']
+
     if arguments['--numpy']:
         format = FMT_NUMPY
     else:
         format = FMT_PICKLE
 
-    do_it(input_video, output_file, format=format,
+    do_it(input_video, output_file, format=format, progress=progress,
           R=r, G=g, B=b, H=h, S=s, V=v)

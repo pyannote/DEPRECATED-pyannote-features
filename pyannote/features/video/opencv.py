@@ -34,7 +34,7 @@ from pyannote.core.feature import SlidingWindowFeature
 
 class OpenCVFeatureExtractor(object):
 
-    def extract(self, path):
+    def extract(self, path, pbar=None):
 
         capture = cv2.VideoCapture(path)
 
@@ -58,6 +58,11 @@ class OpenCVFeatureExtractor(object):
                 break
 
             data[f, :] = self.process_frame(frame)
+
+            if pbar:
+                pbar.update(1. * (f + 1) / frameCount)
+
+        pbar.finish()
 
         duration = step = 1. / framePerSecond
         sliding_window = SlidingWindow(start=0., duration=duration, step=step)

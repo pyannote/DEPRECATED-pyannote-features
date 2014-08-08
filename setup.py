@@ -41,6 +41,7 @@ setup(
         'scikit-learn >=0.14',
         'nltk >= 3.0',
         'scipy >=0.13.0',
+        'progressbar >= 2.2'
     ],
     # versioneer
     version=versioneer.get_version(),
