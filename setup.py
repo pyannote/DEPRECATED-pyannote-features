@@ -39,7 +39,7 @@ setup(
     install_requires=[
         'pyannote.core >= 0.0.5',
         'scikit-learn >=0.14',
-        'nltk >= 3.0',
+        'nltk >= 3.0a1',
         'scipy >=0.13.0',
         'progressbar >= 2.2'
     ],
