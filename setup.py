@@ -45,11 +45,12 @@ setup(
         'scripts/color_histogram.py'
     ],
     install_requires=[
-        'pyannote.core >= 0.0.5',
+        'pyannote.core >= 0.2',
         'scikit-learn >=0.14',
         'nltk >= 3.0',
-        'scipy >=0.13.0',
-        'progressbar >= 2.2'
+        'scipy >=0.10.0',
+        'progressbar >= 2.2',
+        'docopt >= 0.6.2',
     ],
     # versioneer
     version=versioneer.get_version(),
