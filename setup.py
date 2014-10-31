@@ -36,6 +36,10 @@ setup(
     # package
     namespace_packages=['pyannote'],
     packages=find_packages(),
+    scripts=[
+        'scripts/mfcc.py',
+        'scripts/color_histogram.py'
+    ],
     install_requires=[
         'pyannote.core >= 0.0.5',
         'scikit-learn >=0.14',
