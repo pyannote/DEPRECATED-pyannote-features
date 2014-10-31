@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS (Hervé BREDIN - http://herve.niderb.fr)
+# Copyright (c) 2014 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# AUTHORS
+# Hervé BREDIN - http://herve.niderb.fr
+
 from __future__ import unicode_literals
 
 import cv
@@ -34,7 +37,7 @@ from pyannote.core.feature import SlidingWindowFeature
 
 class OpenCVFeatureExtractor(object):
 
-    def extract(self, path):
+    def extract(self, path, pbar=None):
 
         capture = cv2.VideoCapture(path)
 
@@ -58,6 +61,11 @@ class OpenCVFeatureExtractor(object):
                 break
 
             data[f, :] = self.process_frame(frame)
+
+            if pbar:
+                pbar.update(1. * (f + 1) / frameCount)
+
+        pbar.finish()
 
         duration = step = 1. / framePerSecond
         sliding_window = SlidingWindow(start=0., duration=duration, step=step)
