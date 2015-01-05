@@ -45,7 +45,7 @@ setup(
         'scripts/color_histogram.py'
     ],
     install_requires=[
-        'pyannote.core >= 0.2',
+        'pyannote.core >= 0.3',
         'scikit-learn >=0.14',
         'nltk >= 3.0',
         'scipy >=0.10.0',
