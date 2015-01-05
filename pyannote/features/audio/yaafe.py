@@ -160,6 +160,18 @@ class YaafeCompound(YaafeFeatureExtractor):
         return hash(tuple(self.definition()))
 
 
+class YaafeZCR(YaafeFeatureExtractor):
+
+    def definition(self):
+
+        d = [(
+            "zcr",
+            "ZCR blockSize=%d stepSize=%d" % (self.block_size, self.step_size)
+        )]
+
+        return d
+
+
 class YaafeMFCC(YaafeFeatureExtractor):
     """
         | e    |  energy
