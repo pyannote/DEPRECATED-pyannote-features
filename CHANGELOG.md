@@ -1,3 +1,9 @@
+### Version 0.2 (2015-01-05)
+
+  - feat(audio): zero crossing rate extraction
+  - feat(audio): default feature extraction for speech activity detection
+  - setup: switch to pyannote.core 0.3+
+
 ### Version 0.1 (2014-10-31)
 
   - feat(CLI): mfcc.py
