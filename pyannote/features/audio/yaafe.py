@@ -88,12 +88,10 @@ class YaafeFeatureExtractor(object):
         self.block_size = block_size
         self.step_size = step_size
 
-    def get_flow_and_stack(self, **kwargs):
-        raise NotImplementedError(
-            'get_flow_and_stack method must be implemented'
-        )
-
     def extract(self, wav):
+        return self.__call__(wav)
+
+    def __call__(self, wav):
         """Extract features
 
         Parameters
@@ -107,8 +105,16 @@ class YaafeFeatureExtractor(object):
 
         """
 
-        # hack
-        data_flow, stack = self.get_flow_and_stack()
+        definition = self.definition()
+
+        # --- prepare the feature plan
+        feature_plan = yaafelib.FeaturePlan(sample_rate=self.sample_rate)
+        for name, recipe in definition:
+            assert feature_plan.addFeature(
+                "{name}: {recipe}".format(name=name, recipe=recipe))
+
+        # --- prepare the Yaafe engine
+        data_flow = feature_plan.getDataFlow()
 
         engine = yaafelib.Engine()
         engine.load(data_flow)
@@ -119,7 +125,7 @@ class YaafeFeatureExtractor(object):
         audio = np.array(raw_audio, dtype=np.float64, order='C').reshape(1, -1)
 
         features = engine.processAudio(audio)
-        data = np.hstack([features[name] for name in stack])
+        data = np.hstack([features[name] for name, _ in definition])
 
         sliding_window = YaafeFrame(
             blockSize=self.block_size, stepSize=self.step_size,
@@ -128,8 +134,33 @@ class YaafeFeatureExtractor(object):
         return SlidingWindowFeature(data, sliding_window)
 
 
-class YaafeMFCC(YaafeFeatureExtractor):
+class YaafeCompound(YaafeFeatureExtractor):
 
+    def __init__(
+        self, extractors,
+        sample_rate=16000, block_size=512, step_size=256
+    ):
+
+        assert all(e.sample_rate == sample_rate for e in extractors)
+        assert all(e.block_size == block_size for e in extractors)
+        assert all(e.step_size == step_size for e in extractors)
+
+        super(YaafeCompound, self).__init__(
+            sample_rate=sample_rate,
+            block_size=block_size,
+            step_size=step_size)
+
+        self.extractors = extractors
+
+    def definition(self):
+        return [(name, recipe)
+                for e in self.extractors for name, recipe in e.definition()]
+
+    def __hash__(self):
+        return hash(tuple(self.definition()))
+
+
+class YaafeMFCC(YaafeFeatureExtractor):
     """
         | e    |  energy
         | c1   |
@@ -199,55 +230,42 @@ class YaafeMFCC(YaafeFeatureExtractor):
         self.D = D
         self.DD = DD
 
-    def get_flow_and_stack(self):
+    def definition(self):
 
-        feature_plan = yaafelib.FeaturePlan(sample_rate=self.sample_rate)
-        stack = []
+        d = []
 
         # --- coefficients
         # 0 if energy is kept
         # 1 if energy is removed
-        definition = (
-            "mfcc: "
+        d.append((
+            "mfcc",
             "MFCC CepsIgnoreFirstCoeff=%d CepsNbCoeffs=%d "
             "blockSize=%d stepSize=%d" % (
                 0 if self.e else 1,
                 self.coefs + self.e * 1,
                 self.block_size, self.step_size
-            )
-        )
-        assert feature_plan.addFeature(definition)
-        stack.append('mfcc')
+            )))
 
         # --- 1st order derivatives
-        if self.D or self.De:
-            definition = (
-                "mfcc_d: "
-                "MFCC CepsIgnoreFirstCoeff=%d CepsNbCoeffs=%d "
-                "blockSize=%d stepSize=%d > Derivate DOrder=1" % (
-                    0 if self.De else 1,
-                    self.D * self.coefs + self.De * 1,
-                    self.block_size, self.step_size
-                )
-            )
-            assert feature_plan.addFeature(definition)
-            stack.append('mfcc_d')
+        d.append((
+            "mfcc_d",
+            "MFCC CepsIgnoreFirstCoeff=%d CepsNbCoeffs=%d "
+            "blockSize=%d stepSize=%d > Derivate DOrder=1" % (
+                0 if self.De else 1,
+                self.D * self.coefs + self.De * 1,
+                self.block_size, self.step_size
+            )))
 
         # --- 2nd order derivatives
-        if self.DD or self.DDe:
-            definition = (
-                "mfcc_dd: "
-                "MFCC CepsIgnoreFirstCoeff=%d CepsNbCoeffs=%d "
-                "blockSize=%d stepSize=%d > Derivate DOrder=2" % (
-                    0 if self.DDe else 1,
-                    self.DD * self.coefs + self.DDe * 1,
-                    self.block_size, self.step_size
-                )
-            )
-            assert feature_plan.addFeature(definition)
-            stack.append('mfcc_dd')
+        d.append((
+            "mfcc_dd",
+            "MFCC CepsIgnoreFirstCoeff=%d CepsNbCoeffs=%d "
+            "blockSize=%d stepSize=%d > Derivate DOrder=2" % (
+                0 if self.DDe else 1,
+                self.DD * self.coefs + self.DDe * 1,
+                self.block_size, self.step_size
+            )))
 
-        # --- prepare the Yaafe engine
-        data_flow = feature_plan.getDataFlow()
+        return d
 
-        return data_flow, stack
+
