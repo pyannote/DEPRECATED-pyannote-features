@@ -1,3 +1,7 @@
+### Version 0.2.1 (2015-01-07)
+
+  - fix: exception for unrequested MFCC derivatives
+
 ### Version 0.2 (2015-01-05)
 
   - feat(audio): zero crossing rate extraction
