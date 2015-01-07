@@ -259,23 +259,25 @@ class YaafeMFCC(YaafeFeatureExtractor):
             )))
 
         # --- 1st order derivatives
-        d.append((
-            "mfcc_d",
-            "MFCC CepsIgnoreFirstCoeff=%d CepsNbCoeffs=%d "
-            "blockSize=%d stepSize=%d > Derivate DOrder=1" % (
-                0 if self.De else 1,
-                self.D * self.coefs + self.De * 1,
-                self.block_size, self.step_size
-            )))
+        if self.De or self.D:
+            d.append((
+                "mfcc_d",
+                "MFCC CepsIgnoreFirstCoeff=%d CepsNbCoeffs=%d "
+                "blockSize=%d stepSize=%d > Derivate DOrder=1" % (
+                    0 if self.De else 1,
+                    self.D * self.coefs + self.De * 1,
+                    self.block_size, self.step_size
+                )))
 
         # --- 2nd order derivatives
-        d.append((
-            "mfcc_dd",
-            "MFCC CepsIgnoreFirstCoeff=%d CepsNbCoeffs=%d "
-            "blockSize=%d stepSize=%d > Derivate DOrder=2" % (
-                0 if self.DDe else 1,
-                self.DD * self.coefs + self.DDe * 1,
-                self.block_size, self.step_size
-            )))
+        if self.DDe or self.DD:
+            d.append((
+                "mfcc_dd",
+                "MFCC CepsIgnoreFirstCoeff=%d CepsNbCoeffs=%d "
+                "blockSize=%d stepSize=%d > Derivate DOrder=2" % (
+                    0 if self.DDe else 1,
+                    self.DD * self.coefs + self.DDe * 1,
+                    self.block_size, self.step_size
+                )))
 
         return d
