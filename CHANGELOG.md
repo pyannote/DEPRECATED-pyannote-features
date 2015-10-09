@@ -1,3 +1,7 @@
+### Version 0.3.0 (xxxx-xx-xx)
+
+  - feat(video): accurate time-based video frame query with new Video class
+
 ### Version 0.2.1 (2015-01-07)
 
   - fix: exception for unrequested MFCC derivatives
