@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2016 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -42,15 +42,13 @@ setup(
     packages=find_packages(),
     scripts=[
         'scripts/mfcc.py',
-        'scripts/color_histogram.py'
     ],
     install_requires=[
-        'pyannote.core >= 0.3',
+        'pyannote.core >= 0.6.5',
         'scikit-learn >=0.14',
-        'nltk >= 3.0',
-        'scipy >=0.10.0',
-        'progressbar >= 2.2',
-        'docopt >= 0.6.2',
+        'nltk >= 3.1',
+        'scipy >= 0.10.0',
+        'docopt >= 0.6.2'
     ],
     # versioneer
     version=versioneer.get_version(),

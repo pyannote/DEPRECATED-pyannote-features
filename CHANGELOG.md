@@ -1,3 +1,8 @@
+### Version 0.3 (2016-06-13)
+
+  - feat: add .dimension() method to Yaafe extractors
+  - chore: remove video code (use pyannote.video instead)
+  
 ### Version 0.2.1 (2015-01-07)
 
   - fix: exception for unrequested MFCC derivatives
