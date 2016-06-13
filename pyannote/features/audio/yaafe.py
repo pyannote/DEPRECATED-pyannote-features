@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2015 CNRS
+# Copyright (c) 2014-2016 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -91,6 +91,9 @@ class YaafeFeatureExtractor(object):
     def extract(self, wav):
         return self.__call__(wav)
 
+    def dimension(self):
+        raise NotImplementedError('')
+
     def __call__(self, wav):
         """Extract features
 
@@ -152,6 +155,9 @@ class YaafeCompound(YaafeFeatureExtractor):
 
         self.extractors = extractors
 
+    def dimension(self):
+        return sum(extractor.dimension() for extractor in self.extractors)
+
     def definition(self):
         return [(name, recipe)
                 for e in self.extractors for name, recipe in e.definition()]
@@ -161,6 +167,9 @@ class YaafeCompound(YaafeFeatureExtractor):
 
 
 class YaafeZCR(YaafeFeatureExtractor):
+
+    def dimension(self):
+        return 1
 
     def definition(self):
 
@@ -241,6 +250,18 @@ class YaafeMFCC(YaafeFeatureExtractor):
         self.DDe = DDe
         self.D = D
         self.DD = DD
+
+    def dimension(self):
+
+        n_features = 0
+        n_features += self.e
+        n_features += self.De
+        n_features += self.DDe
+        n_features += self.coefs
+        n_features += self.coefs * self.D
+        n_features += self.coefs * self.DD
+
+        return n_features
 
     def definition(self):
 
